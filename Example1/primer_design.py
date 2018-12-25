@@ -5,11 +5,13 @@ from Bio import SeqIO
 
 
 def load_seq(fseq):
+    """载入上一步获取的基因序列"""
     handle = SeqIO.parse(fseq, 'fasta')
     return handle
 
-
 def designer(seq):
+    """传入一条序列，针对该序列设计引物"""
+    # 引物设计的默认参数，如不符合需求可以做相应更改
     default_params = {
         'PRIMER_TASK': 'generic',
         'PRIMER_PICK_LEFT_PRIMER': 1,
@@ -34,6 +36,8 @@ def designer(seq):
         'PRIMER_PAIR_MAX_COMPL_END': 8,
         'PRIMER_PRODUCT_SIZE_RANGE': [[200, 400]],
         }
+    # 参数更改示例
+    # default_params['PRIMER_OPT_SIZE'] = 20
     try:
         result = primer3.bindings.designPrimers(
                 {
@@ -47,6 +51,7 @@ def designer(seq):
     return result
 
 def prepare_output(seq, result, fhandle):
+    """将设计好的引物按一定的格式保存"""
     if result is None:
         fhandle.write(seq.id + '\n')
     else:
@@ -64,6 +69,7 @@ def prepare_output(seq, result, fhandle):
 def main():
     handle = load_seq(fseq)
     fhandle = open('primers.txt', 'w')
+    fhandle.write('seqID\tForward\tReverse\tTM_Forward\tTM_Reverse\tPosition_Forward\tPosition_Reverse\n')
     for record in handle:
         result = designer(record)
         prepare_output(record, result, fhandle)

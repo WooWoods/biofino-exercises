@@ -5,6 +5,7 @@ from Bio import Entrez, SeqIO
 
 
 def load_HSP(fdb):
+    """从refGene数据库中选出HSP家族的基因"""
     data = {}
     with open(fdb) as fh:
         for line in fh:
@@ -17,6 +18,8 @@ def load_HSP(fdb):
     return data
 
 def search_entrez(accession):
+    """传入一个基因的accession，从NCBI上获取其序列"""
+    # 设置为从API获取数据，以免高频率的访问对网站造成过重负担而被封禁ip
     Entrez.api_key = "MyAPIkey"
     Entrez.email = 'wujunjames@126.com'
     try:
@@ -31,6 +34,7 @@ def main():
     with open('HSPfam.fa', 'w') as fh:
         for gname, acc in data.items():
             record = search_entrez(acc)
+            # 逐个获取序列并保存为fasta格式
             if record is not None:
                 SeqIO.write(record, fh, 'fasta')
 
